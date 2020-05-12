@@ -33,7 +33,7 @@ const App = (props) => {
 
   const notesToShow = showAll
     ? notes
-    : notes.filter(note => note.important === SVGComponentTransferFunctionElement)
+    : notes.filter(note => note.important)
 
   return (
     <div>
