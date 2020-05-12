@@ -19,7 +19,7 @@
 	- `name`だけ抽出したい
     	- `for`ループでの回答
       	- ```JavaScript
-					let names = []
+					let names=[]
 					for (let i = 0; i < animals.length; i++) {
 						names.push(animals[i].name)
 					}
