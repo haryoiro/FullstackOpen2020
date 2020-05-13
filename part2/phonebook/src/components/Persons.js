@@ -8,7 +8,7 @@ const Persons = ({ persons, filterString }) => {
       {persons
         .filter(x => x.name.match(new RegExp(regExpEscape(filterString))))
         .map(person => (
-        <div>{person.name} {person.number}</div>
+          <div key={person.id}>{person.name} {person.number}</div>
       ))}
     </div>
   )
