@@ -2,14 +2,21 @@ import React from 'react'
 
 import {regExpEscape} from '../util/regExpHelper'
 
-const Persons = ({ persons, filterString }) => {
+const Persons = ({ persons, filterString, onClick }) => {
   return (
     <div>
       {persons
         .filter(x => x.name.match(new RegExp(regExpEscape(filterString))))
-        .map(person => (
-          <div key={person.id}>{person.name} {person.number}</div>
-      ))}
+        .map(person => {
+          const { id, name, number } = person
+          return (
+            <div key={id}>
+              {name} {number}
+              <button id={id} name={name} onClick={onClick}>delete</button>
+            </div>
+          )
+        }
+      )}
     </div>
   )
 }
