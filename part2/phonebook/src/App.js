@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 
 // Components
 import Notification from './components/Notification'
-import Filter from './components/Filter'
-import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import Filter       from './components/Filter'
+import PersonForm   from './components/PersonForm'
+import Persons      from './components/Persons'
 
 // Services
 import personsServices from './services/persons'
@@ -126,7 +126,6 @@ const App = () => {
         onClick={deletePerson}
       />
     </div>
-
   )
 }
 
