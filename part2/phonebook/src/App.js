@@ -51,7 +51,7 @@ const App = () => {
   }
 
   const deletePerson = event => {
-    const id = parseInt(event.target.id, 10)
+    const id = Number(event.target.id, 10)
     const name = event.target.name
     if (window.confirm(`Delete ${name} ?`)) {
       personsServices
