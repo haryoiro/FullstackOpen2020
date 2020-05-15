@@ -47,11 +47,24 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(err => {
+          let messages = ''
+          if (err.response.data['name']) {
+            messages += err.response.data['name'].message + '\n'
+          }
+          if (err.response.data['number']) {
+            messages += err.response.data['number'].message
+          }
+          setMessage({ message: `${messages}`, type: "failure" })
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
+        })
     }
   }
 
   const deletePerson = event => {
-    const id = Number(event.target.id, 10)
+    const id = event.target.id
     const name = event.target.name
     if (window.confirm(`Delete ${name} ?`)) {
       personsServices
@@ -64,7 +77,6 @@ const App = () => {
           }, 3000)
         })
         .catch(err => {
-          console.log(err)
           setMessage({ message: `Information of ${name} has already been removed from server`, type: "failure" })
           setTimeout(() => {
             setMessage(null)
