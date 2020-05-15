@@ -1,0 +1,33 @@
+{
+  "name": "EXAP",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/haryoiro/FSO2020-Part3.git",
+  "author": "haryoiro <mizusecocolte@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf build && cd ../../FSO2020/part2/phonebook && yarn build && cp -r ./build ../../../FSO2020P3/FSO2020P3",
+    "bd": "yarn build:ui && yarn dev",
+    "deploy": "git push heroku master",
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint .",
+    "fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.14",
+    "mongoose-unique-validator": "^2.0.3",
+    "morgan": "^1.10.0",
+    "node-uuid": "^1.4.8"
+  },
+  "devDependencies": {
+    "eslint": "^7.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "nodemon": "^2.0.3"
+  }
+}
