@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
-
 const mongoose = require('mongoose')
 
 const blogSchema = mongoose.Schema({
