@@ -1,10 +1,11 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const mongoose = require('mongoose')
 
-const blogSchema = mongoose.Schema({
+const blogSchema = new mongoose.Schema({
   title: {
     type: String,
     require: true,
+    minlength: 4,
   },
   author: String,
   url: {
@@ -19,6 +20,7 @@ blogSchema.set('toJSON', {
     ret.id = ret._id.toString()
     delete ret._id
     delete ret.__v
+    return ret
   },
 })
 
