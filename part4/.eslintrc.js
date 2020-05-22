@@ -24,9 +24,6 @@ module.exports = {
     'object-curly-spacing': ['error', 'always'],
     'arrow-spacing': ['error', { before: true, after: true }],
     'no-console': 0,
-    'no-restricted-syntax': [
-      'error',
-      'ForOfStatement[await=true]',
-    ],
+    'no-restricted-syntax': ['error', 'ForOfStatement[await=true]'],
   },
 }

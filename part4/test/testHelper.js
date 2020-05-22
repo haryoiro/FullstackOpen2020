@@ -1,5 +1,5 @@
-const Blog = require('../model/blog')
-
+const Blog = require('../model/blog.model')
+const User = require('../model/user.model')
 
 const listWithOneBlog = [
   {
@@ -52,12 +52,14 @@ const listWithManyBlogs = [
     likes: 2,
   },
 ]
-const mostLikedBlog = [{
-  title: 'Canonical string reduction',
-  author: 'Edsger W. Dijkstra',
-  url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-  likes: 12,
-}]
+const mostLikedBlog = [
+  {
+    title: 'Canonical string reduction',
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+    likes: 12,
+  },
+]
 
 const mostAuthor = {
   author: 'Robert C. Martin',
@@ -69,9 +71,25 @@ const mostLikedAuthor = {
   likes: 12,
 }
 
+const listWithManyUsers = [
+  {
+    username: 'Usern',
+    password: 'Hello',
+  },
+  {
+    username: 'Usernn',
+    password: 'HUHUHU',
+  },
+]
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map((blog) => blog.toJSON())
+}
+
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map((user) => user.toJSON())
 }
 
 module.exports = {
@@ -81,4 +99,6 @@ module.exports = {
   mostAuthor,
   mostLikedAuthor,
   blogsInDb,
+  usersInDb,
+  listWithManyUsers,
 }

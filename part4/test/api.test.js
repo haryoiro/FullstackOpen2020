@@ -1,13 +1,12 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const supertest = require('supertest')
 const api = supertest(require('../app'))
 
-const Blog = require('../model/blog')
+const Blog = require('../model/blog.model')
+const User = require('../model/user.model')
 
-const {
-  listWithManyBlogs,
-  blogsInDb,
-} = require('./testHelper')
+const { listWithManyBlogs, blogsInDb, usersInDb } = require('./testHelper')
 
 beforeAll(async () => {
   await Blog.deleteMany({})
@@ -62,17 +61,13 @@ describe('データが正常に返ってくる', () => {
   test('IDではないデータがリクエストされた時400エラーを返す', async () => {
     const nonID = { content: 'nonID' }
 
-    await api
-      .get(`/api/blogs/${nonID}`)
-      .expect(400)
+    await api.get(`/api/blogs/${nonID}`).expect(400)
   })
 
   test('存在しないIDがリクエストされた時404エラーを返す', async () => {
     const nonExistId = '5ec234b70d80164b7590854e'
 
-    await api
-      .get(`/api/blogs/${nonExistId}`)
-      .expect(404)
+    await api.get(`/api/blogs/${nonExistId}`).expect(404)
   })
 })
 
@@ -132,14 +127,8 @@ describe('データを正常に挿入できる', () => {
       likes: 10000000,
     }
 
-    await api
-      .post('/api/blogs')
-      .send(emptyTitleBlog)
-      .expect(400)
-    await api
-      .post('/api/blogs')
-      .send(emptyURLBlog)
-      .expect(400)
+    await api.post('/api/blogs').send(emptyTitleBlog).expect(400)
+    await api.post('/api/blogs').send(emptyURLBlog).expect(400)
   })
 })
 describe('データの削除', () => {
@@ -147,9 +136,7 @@ describe('データの削除', () => {
     const allBlogs = await blogsInDb()
     const blogToDelete = allBlogs[0]
 
-    await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
-      .expect(204)
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
     const blogsAtEnd = await blogsInDb()
     expect(blogsAtEnd).toHaveLength(allBlogs.length - 1)
@@ -161,9 +148,7 @@ describe('データの削除', () => {
   test('存在しないIDの削除を試みると404', async () => {
     const nonExistId = '5ec234b70d80164b7590812e'
 
-    const end = await api
-      .delete(`/api/blogs/${nonExistId}`)
-      .expect(404)
+    const end = await api.delete(`/api/blogs/${nonExistId}`).expect(404)
 
     expect(end.text).toContain('Blog not found')
   })
@@ -176,10 +161,7 @@ describe('データのアップデート', () => {
 
     const blog = { title: 'Updated' }
 
-    await api
-      .put(`/api/blogs/${blogToUpdate.id}`)
-      .send(blog)
-      .expect(204)
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog).expect(204)
 
     const updatedAllBlogs = await blogsInDb()
     expect(updatedAllBlogs).toHaveLength(allBlogs.length)
@@ -189,8 +171,72 @@ describe('データのアップデート', () => {
   })
 })
 
+describe('ユーザ認証', () => {
+  beforeAll(async () => {
+    await User.deleteMany({})
 
-afterAll(async (done) => {
+    // テスト用のルートユーザ
+    // apiと同じキーとストレッチを行う。
+    const passwordHash = await bcrypt.hash('secretKey', 10)
+    const user = await new User({ username: 'root', password: passwordHash })
+
+    await user.save()
+  })
+  test('ユーザを新規作成することができる', async () => {
+    const startAtUsers = await usersInDb()
+
+    const user = {
+      username: 'superMan',
+      password: 'secret1',
+    }
+
+    await api.post('/api/users').send(user).expect(200)
+
+    const createdUsers = await usersInDb()
+    expect(createdUsers).toHaveLength(startAtUsers.length + 1)
+  })
+
+  test('ユーザ名かパスワードが3文字以下なら400 Bad Request', async () => {
+    const startAtUsers = await usersInDb()
+
+    const user = {
+      username: 'a',
+      password: 'a',
+    }
+
+    await api.post('/api/users').send(user).expect(400)
+
+    const endAtUsers = await usersInDb()
+    expect(endAtUsers).toHaveLength(startAtUsers.length)
+  })
+
+  test('username or passwordどちらかのフィールドが空なら400 Bad Request', async () => {
+    const startAtUsers = await usersInDb()
+
+    const passwordEmpty = {
+      username: 'password is empty',
+      name: 'name',
+    }
+    const usernameEmpty = {
+      name: 'name',
+      password: 'username is empty',
+    }
+
+    await api.post('/api/users').send(usernameEmpty).expect(400)
+    await api.post('/api/users').send(passwordEmpty).expect(400)
+
+    const endAtUsers = await usersInDb()
+    expect(endAtUsers).toHaveLength(startAtUsers.length)
+  })
+
+  test('ユーザ一覧をJSON形式で取得できる', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+})
+
+afterAll(async () => {
   mongoose.connection.close()
-  done()
 })

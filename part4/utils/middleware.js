@@ -1,11 +1,11 @@
-const { info, error } = require('./logger')
+const logger = require('./logger')
 
 const requestLogger = (req, res, next) => {
-  info('---')
-  info('Method:', req.method)
-  info('Path  :', req.path)
-  info('Body  :', req.body)
-  info('---')
+  logger.info('========================')
+  logger.succ('Method:', req.method)
+  logger.succ('Path:', req.path)
+  logger.succ('Body:', req.body)
+  logger.info('========================')
   next()
 }
 
@@ -13,16 +13,18 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
 
-const errorHandler = (err, request, response, next) => {
-  error(err.message)
-
-  if (err.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+const errorHandler = (err, req, res, next) => {
+  if (err.name === 'CastError' && err.kind === 'ObjectId') {
+    return res.status(400).send({ error: 'malformatted id' })
   }
   if (err.name === 'ValidationError') {
-    return response.status(400).json({ error: err.message })
+    return res.status(400).json({ error: err.message })
+  }
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({ error: 'invalid token' })
   }
 
+  logger.error(err.message)
   return next(err)
 }
 
