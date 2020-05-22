@@ -28,11 +28,13 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.get('/:id', async (req, res) => {
   const userId = req.params.id
+  // ユーザIDが入力されていなければエラー
   if (!userId) {
     return res.status(400).json({ message: 'invalid ID', error: true }).end()
   }
 
   const result = await User.findById(userId)
+  // IDがDB上になければエラー
   if (!result) {
     return res
       .status(404)
