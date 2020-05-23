@@ -1,9 +1,11 @@
+/* eslint-disable no-param-reassign, no-underscore-dangle */
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../model/user.model')
 
 usersRouter.get('/', async (req, res) => {
-  const users = await User.find({})
+  const users = await User
+    .find({}).populate('blogs')
   res.json(users.map((user) => user.toJSON()))
 })
 
@@ -19,10 +21,13 @@ usersRouter.post('/', async (req, res) => {
 
   const newUser = await new User({
     username: body.username,
+    name: body.name,
     passwordHash,
+    blogs: [],
   })
 
   const savedUser = await newUser.save()
+
   res.json(savedUser)
 })
 

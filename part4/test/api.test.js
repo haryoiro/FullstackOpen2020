@@ -73,11 +73,15 @@ describe('データが正常に返ってくる', () => {
 
 describe('データを正常に挿入できる', () => {
   test('新しいblog評価を追加する', async () => {
+    const startAtUser = await usersInDb()
+    const firstId = startAtUser.map((a) => a.id)
+
     const newBlog = {
       title: 'Hello World by Haryo',
       author: 'Haryoiro',
       url: 'www.example.com',
       likes: 1,
+      userId: firstId[0],
     }
 
     await api
@@ -93,10 +97,14 @@ describe('データを正常に挿入できる', () => {
   })
 
   test('送信したLikes欄が空なら０を挿入する', async () => {
+    const startAtUser = await usersInDb()
+    const firstId = startAtUser.map((a) => a.id)
+
     const newBlog = {
       title: 'Likes Property is empty',
       author: 'Likes Empty',
       url: 'www.likes-empty.com',
+      userId: firstId[0],
     }
 
     await api
@@ -112,6 +120,7 @@ describe('データを正常に挿入できる', () => {
       author: content.author,
       url: content.url,
       likes: content.likes,
+      userId: firstId[0],
     }
     expect(formatted).toEqual({ ...newBlog, likes: 0 })
   })
@@ -182,15 +191,26 @@ describe('ユーザ認証', () => {
 
     await user.save()
   })
+
+  test('ユーザ一覧をJSON形式で取得できる', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
   test('ユーザを新規作成することができる', async () => {
     const startAtUsers = await usersInDb()
 
     const user = {
       username: 'superMan',
       password: 'secret1',
+      blogsId: [],
     }
 
-    await api.post('/api/users').send(user).expect(200)
+    await api
+      .post('/api/users')
+      .send(user)
+      .expect(200)
 
     const createdUsers = await usersInDb()
     expect(createdUsers).toHaveLength(startAtUsers.length + 1)
@@ -202,6 +222,7 @@ describe('ユーザ認証', () => {
     const user = {
       username: 'a',
       password: 'a',
+      blogs: [],
     }
 
     await api.post('/api/users').send(user).expect(400)
@@ -227,13 +248,6 @@ describe('ユーザ認証', () => {
 
     const endAtUsers = await usersInDb()
     expect(endAtUsers).toHaveLength(startAtUsers.length)
-  })
-
-  test('ユーザ一覧をJSON形式で取得できる', async () => {
-    await api
-      .get('/api/users')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
   })
 })
 
