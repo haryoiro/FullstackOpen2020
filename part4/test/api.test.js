@@ -207,10 +207,7 @@ describe('ユーザ認証', () => {
       blogsId: [],
     }
 
-    await api
-      .post('/api/users')
-      .send(user)
-      .expect(200)
+    await api.post('/api/users').send(user).expect(200)
 
     const createdUsers = await usersInDb()
     expect(createdUsers).toHaveLength(startAtUsers.length + 1)

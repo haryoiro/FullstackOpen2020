@@ -4,8 +4,7 @@ const usersRouter = require('express').Router()
 const User = require('../model/user.model')
 
 usersRouter.get('/', async (req, res) => {
-  const users = await User
-    .find({}).populate('blogs')
+  const users = await User.find({}).populate('blogs')
   res.json(users.map((user) => user.toJSON()))
 })
 
@@ -13,7 +12,14 @@ usersRouter.post('/', async (req, res) => {
   const { body } = req
 
   if (!body.username || !body.password) {
-    res.status(400).json({ message: 'invalid password or username length.\nrequire longer than 3 length of characters.', error: true }).end()
+    res
+      .status(400)
+      .json({
+        message:
+          'invalid password or username length.\nrequire longer than 3 length of characters.',
+        error: true,
+      })
+      .end()
   }
 
   const salt = 10

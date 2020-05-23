@@ -8,8 +8,10 @@ const { SECRET } = process.env
 const { getTokenFrom } = require('../utils/authHelper')
 
 blogsRouter.get('/', async (req, res) => {
-  const allBlogs = await Blog
-    .find({}).populate('user', { username: 1, user: 1 })
+  const allBlogs = await Blog.find({}).populate('user', {
+    username: 1,
+    user: 1,
+  })
   res.json(allBlogs)
 })
 
