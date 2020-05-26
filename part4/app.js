@@ -12,6 +12,7 @@ const {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenMiddleware,
 } = require('./utils/middleware')
 
 logger.info(' ================================================')
@@ -33,9 +34,11 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
+app.use(tokenMiddleware)
 
 app.use('/api/blogs', require('./controllers/blogs.controller'))
 app.use('/api/users', require('./controllers/users.controller'))
+app.use('/api/login', require('./controllers/login.controller'))
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

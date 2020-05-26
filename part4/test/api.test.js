@@ -6,7 +6,14 @@ const api = supertest(require('../app'))
 const Blog = require('../model/blog.model')
 const User = require('../model/user.model')
 
-const { listWithManyBlogs, blogsInDb, usersInDb } = require('./testHelper')
+const {
+  listWithManyBlogs,
+  blogsInDb,
+  usersInDb,
+  testUser,
+} = require('./testHelper')
+
+let token = null
 
 beforeAll(async () => {
   await Blog.deleteMany({})
@@ -71,115 +78,6 @@ describe('データが正常に返ってくる', () => {
   })
 })
 
-describe('データを正常に挿入できる', () => {
-  test('新しいblog評価を追加する', async () => {
-    const startAtUser = await usersInDb()
-    const firstId = startAtUser.map((a) => a.id)
-
-    const newBlog = {
-      title: 'Hello World by Haryo',
-      author: 'Haryoiro',
-      url: 'www.example.com',
-      likes: 1,
-      userId: firstId[0],
-    }
-
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-
-    const blogsAtEnd = await blogsInDb()
-    expect(blogsAtEnd).toHaveLength(listWithManyBlogs.length + 1)
-    const content = blogsAtEnd.map((n) => n.title)
-    expect(content).toContain('Hello World by Haryo')
-  })
-
-  test('送信したLikes欄が空なら０を挿入する', async () => {
-    const startAtUser = await usersInDb()
-    const firstId = startAtUser.map((a) => a.id)
-
-    const newBlog = {
-      title: 'Likes Property is empty',
-      author: 'Likes Empty',
-      url: 'www.likes-empty.com',
-      userId: firstId[0],
-    }
-
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-
-    const blogsAtEnd = await blogsInDb()
-    const content = await blogsAtEnd[blogsAtEnd.length - 1]
-    const formatted = {
-      title: content.title,
-      author: content.author,
-      url: content.url,
-      likes: content.likes,
-      userId: firstId[0],
-    }
-    expect(formatted).toEqual({ ...newBlog, likes: 0 })
-  })
-  test('送信したデータのtitle or urlが空なら 400 Bad Request', async () => {
-    const emptyTitleBlog = {
-      author: 'empty',
-      likes: 10000000,
-      url: 'www.url-is-not-empty.net',
-    }
-    const emptyURLBlog = {
-      title: 'title is not empty',
-      author: 'empty',
-      likes: 10000000,
-    }
-
-    await api.post('/api/blogs').send(emptyTitleBlog).expect(400)
-    await api.post('/api/blogs').send(emptyURLBlog).expect(400)
-  })
-})
-describe('データの削除', () => {
-  test('データを正常に削除できる', async () => {
-    const allBlogs = await blogsInDb()
-    const blogToDelete = allBlogs[0]
-
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
-
-    const blogsAtEnd = await blogsInDb()
-    expect(blogsAtEnd).toHaveLength(allBlogs.length - 1)
-
-    const contents = blogsAtEnd.map((r) => r.title)
-    expect(contents).not.toContain(blogToDelete.title)
-  })
-
-  test('存在しないIDの削除を試みると404', async () => {
-    const nonExistId = '5ec234b70d80164b7590812e'
-
-    const end = await api.delete(`/api/blogs/${nonExistId}`).expect(404)
-
-    expect(end.text).toContain('Blog not found')
-  })
-})
-
-describe('データのアップデート', () => {
-  test('データを正しくアップデートできる', async () => {
-    const allBlogs = await blogsInDb()
-    const blogToUpdate = allBlogs[0]
-
-    const blog = { title: 'Updated' }
-
-    await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog).expect(204)
-
-    const updatedAllBlogs = await blogsInDb()
-    expect(updatedAllBlogs).toHaveLength(allBlogs.length)
-
-    const updatedFirstBlog = updatedAllBlogs[0]
-    expect(updatedFirstBlog).toEqual({ ...blogToUpdate, title: 'Updated' })
-  })
-})
-
 describe('ユーザ認証', () => {
   beforeAll(async () => {
     await User.deleteMany({})
@@ -198,16 +96,11 @@ describe('ユーザ認証', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
+
   test('ユーザを新規作成することができる', async () => {
     const startAtUsers = await usersInDb()
 
-    const user = {
-      username: 'superMan',
-      password: 'secret1',
-      blogsId: [],
-    }
-
-    await api.post('/api/users').send(user).expect(200)
+    await api.post('/api/users').send(testUser).expect(200)
 
     const createdUsers = await usersInDb()
     expect(createdUsers).toHaveLength(startAtUsers.length + 1)
@@ -245,6 +138,130 @@ describe('ユーザ認証', () => {
 
     const endAtUsers = await usersInDb()
     expect(endAtUsers).toHaveLength(startAtUsers.length)
+  })
+
+  test('ログインできる', async () => {
+    const startUser = {
+      username: 'superMan',
+      password: 'secret1',
+    }
+
+    await api.post('/api/login').send(startUser).expect(200)
+  })
+})
+
+describe('データを正常に挿入できる', () => {
+  test('新しいblog評価を追加する', async () => {
+    const startUser = {
+      username: 'superMan',
+      password: 'secret1',
+    }
+    const res = await api.post('/api/login').send(startUser)
+    token = res.body.token
+
+    const newBlog = {
+      title: 'Hello World by Haryo',
+      author: 'Haryoiro',
+      url: 'www.example.com',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .auth(token, { type: 'bearer' })
+      .expect(200)
+  })
+
+  test('送信したLikes欄が空なら０を挿入する', async () => {
+    const newBlog = {
+      title: 'Likes Property is empty',
+      author: 'Likes Empty',
+      url: 'www.likes-empty.com',
+    }
+
+    const savedBlog = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .auth(token, { type: 'bearer' })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    // console.log(savedBlog)
+    expect(savedBlog.body).toHaveProperty('likes', 0)
+  })
+
+  test('送信したデータのtitle or urlが空なら 400 Bad Request', async () => {
+    const emptyTitleBlog = {
+      author: 'empty',
+      likes: 10000000,
+      url: 'www.url-is-not-empty.net',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(emptyTitleBlog)
+      .auth(token, { type: 'bearer' })
+      .expect(400)
+  })
+})
+describe('データの削除', () => {
+  test('データを正常に削除できる', async () => {
+    const allBlogs = await blogsInDb()
+    // const allUsers = await usersInDb()
+    const loggedInUser = allBlogs[allBlogs.length - 1]
+    const user = await api.get(`/api/users/${loggedInUser.user}`)
+
+    const deleteBlogId = user.body.blogs[1]
+    await api
+      .delete(`/api/blogs/${deleteBlogId}`)
+      .auth(token, { type: 'bearer' })
+      .expect(204)
+
+    const blogsAtEnd = await blogsInDb()
+    expect(blogsAtEnd).toHaveLength(allBlogs.length)
+
+    const contents = blogsAtEnd.map((r) => r.title)
+    expect(contents).not.toContain(loggedInUser.title)
+  })
+
+  test('投稿主以外のトークンで削除しようとすると401', async () => {
+    const invalidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVyTWFuIiwiaWQiOiI1ZWM2NTJkMGRlZDljM2M4ZTk4OWE0YzAiLCJpYXQiOjE1OTA0NzM3MDN9.0E1XfpFxNzjngGr2d4UfhrxbgxoDg1JWpimHekDisAs'
+
+    const allBlogs = await blogsInDb()
+    const deleteBlog = allBlogs[allBlogs.length - 2]
+
+    await api
+      .delete(`/api/blogs/${deleteBlog.id}`)
+      .auth(invalidToken, { type: 'bearer' })
+      .expect(401)
+  })
+
+  test('存在しないIDの削除を試みると401', async () => {
+    const nonExistId = '5ec234b70d80164b7590812e'
+
+    const end = await api
+      .delete(`/api/blogs/${nonExistId}`)
+      .auth(token, { type: 'bearer' })
+      .expect(404)
+
+    expect(end.text).toContain('Blog not found')
+  })
+})
+
+describe('データのアップデート', () => {
+  test('データを正しくアップデートできる', async () => {
+    const allBlogs = await blogsInDb()
+    const blogToUpdate = allBlogs[0]
+
+    const blog = { title: 'Updated' }
+
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog).expect(204)
+
+    const updatedAllBlogs = await blogsInDb()
+    expect(updatedAllBlogs).toHaveLength(allBlogs.length)
+
+    const updatedFirstBlog = updatedAllBlogs[0]
+    expect(updatedFirstBlog).toEqual({ ...blogToUpdate, title: 'Updated' })
   })
 })
 

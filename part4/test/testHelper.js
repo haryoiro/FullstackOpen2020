@@ -82,6 +82,12 @@ const listWithManyUsers = [
   },
 ]
 
+const testUser = {
+  username: 'superMan',
+  password: 'secret1',
+  blogsId: [],
+}
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map((blog) => blog.toJSON())
@@ -101,4 +107,5 @@ module.exports = {
   blogsInDb,
   usersInDb,
   listWithManyUsers,
+  testUser,
 }

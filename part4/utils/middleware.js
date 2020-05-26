@@ -28,8 +28,18 @@ const errorHandler = (err, req, res, next) => {
   return next(err)
 }
 
+const tokenMiddleware = (req, res, next) => {
+  const auth = req.get('authorization')
+
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    req.token = auth.substring(7)
+  }
+  next()
+}
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenMiddleware,
 }

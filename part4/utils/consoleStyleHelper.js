@@ -25,7 +25,6 @@ const style = {
   BgCyan: '\x1b[46m',
   BgWhite: '\x1b[47m',
 }
-
 module.exports = {
   style,
 }
