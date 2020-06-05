@@ -46,8 +46,8 @@ const Blog = ({ blog, updateLikes, handleDelete }) => {
 
 
   return (
-    <div key={blog.id} style={style}>
-      {`${blog.title} `}
+    <div key={blog.id} style={style} className="blog-list">
+      <span>{`${blog.title} `}</span>
       <button type="submit" onClick={toggleVisibility} style={hideWhenVisible} className="show-button">SHOW</button>
       <button type="submit" onClick={toggleVisibility} style={showWhenVisible} className="hide-button">HIDE</button>
       <div style={showWhenVisible} className="blog-details">

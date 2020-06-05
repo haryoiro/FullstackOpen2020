@@ -23,7 +23,7 @@ const App = () => {
     blogService
       .getAll()
       .then((returnedBlogs) => {
-        setBlogs(returnedBlogs)
+        setBlogs(returnedBlogs.sort(sortHelper))
       })
   }, [])
 
@@ -47,7 +47,7 @@ const App = () => {
     } catch (err) {
       setErrorMessage({ message: 'Wrong username or password', status: true })
 
-      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 3000)
+      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 5000)
     }
   }
 
@@ -58,7 +58,7 @@ const App = () => {
     setUsername(null)
 
     setErrorMessage({ message: 'Logout success', status: false })
-    setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 3000)
+    setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 5000)
   }
 
   const handleBlogSubmit = async (blogObject) => {
@@ -69,10 +69,10 @@ const App = () => {
       setBlogs(blogs.concat(addedBlog))
 
       setErrorMessage({ message: `a new blog ${blogObject.title} added`, status: false })
-      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 3000)
+      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 5000)
     } catch (err) {
       setErrorMessage({ message: `${err}`, status: true })
-      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 3000)
+      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 5000)
     }
   }
 
@@ -82,7 +82,8 @@ const App = () => {
     updateBlog.likes += 1
     delete updateBlog.user
 
-    await blogService.addLikes(event.id, updateBlog)
+    const updatedBlogs = await blogService.addLikes(event.id, updateBlog)
+    await setBlogs(blogs.map((b) => b.id !== updatedBlogs.id ? b : updatedBlogs).sort(sortHelper))
   }
 
   const sortHelper = (a, b) => {
@@ -99,7 +100,7 @@ const App = () => {
       }
     } catch (err) {
       setErrorMessage(err, false)
-      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 3000)
+      setTimeout(() => { setErrorMessage({ message: null, error: false }) }, 5000)
     }
   }
 
@@ -115,7 +116,7 @@ const App = () => {
               <BlogForm handleSubmit={handleBlogSubmit} />
             </Togglable>
             <div>
-              {blogs.sort(sortHelper).map((blog) => (
+              {blogs.map((blog) => (
                 <Blog
                   key={blog.id}
                   blog={blog}

@@ -2,13 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const Message = ({ message }) => (
-  <div>
+  <div id="message">
     {message.message !== null
     && (
       <div className="message">
         {message.status
-          ? <div className="error">{message.message}</div>
-          : <div className="success">{message.message}</div>}
+          ? <div className="error" id="error">{message.message}</div>
+          : <div className="success" id="success">{message.message}</div>}
       </div>
     )}
   </div>
