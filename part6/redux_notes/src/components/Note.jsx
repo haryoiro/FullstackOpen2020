@@ -1,7 +1,7 @@
+import { toggleImportanceOf } from '../reducers/noteReducer'
+
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-
-import { toggleImportanceOf } from '../Reducers/noteReducer'
 
 function Note ({ note, onClick}) {
   return (

@@ -1,14 +1,10 @@
-const initialMessage = 'Hello Notification'
-
-export const notific = (message) => {
-  return {
-    type: Notification,
-    message,
+const notificationReducer = (state = null, action) => {
+  switch (action.type) {
+    case 'PUSH_NOTIFICATION':
+      return action.data
+    default :
+      return state
   }
-}
-
-const notificationReducer = (state = initialMessage, aciton) => {
-  console.log(state)
 }
 
 export default notificationReducer

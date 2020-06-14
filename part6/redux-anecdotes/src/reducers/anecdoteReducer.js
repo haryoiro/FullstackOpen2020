@@ -17,24 +17,6 @@ export const asObject = (anecdote) => {
   }
 }
 
-export const addVote = (id) => {
-  return {
-    type: 'ADD_VOTE',
-    data: { id }
-  }
-}
-
-export const createAnecdotes = (content) => {
-  return {
-    type: 'CREATE_ANECDOTES',
-    data: {
-      content: content,
-      id: getId(),
-      votes:0,
-    }
-  }
-}
-
 const initialState = anecdotesAtStart.map(asObject)
 
 const anecdotesReducer = (state = initialState, action) => {
