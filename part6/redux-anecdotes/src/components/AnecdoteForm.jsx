@@ -3,20 +3,21 @@ import {
   pushNotification
 } from '../actions/index'
 
+import anecdotesServices from '../services/anecdote'
+
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
 
-  const addAnecdotes = (event) => {
+  const addAnecdotes = async (event) => {
     event.preventDefault()
     const content = event.target.anecdotes.value
-
-    dispatch(createAnecdotes(content))
-    notifier(content)
-
     event.target.anecdotes.value = ''
+    const newAnecdote = await anecdotesServices.createNew(content)
+    dispatch(createAnecdotes(newAnecdote))
+    notifier(content)
   }
 
   const notifier = (content) => {
