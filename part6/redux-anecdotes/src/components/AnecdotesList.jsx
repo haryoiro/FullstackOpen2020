@@ -24,10 +24,7 @@ const AnecdotesList = (props) => {
 
   const notifier = (id) => {
     const votedAnecs = anecdotes.find((a) => a.id === id).content
-    dispatch(pushNotification(`"${votedAnecs}" voted`))
-    setInterval(() => {
-      dispatch(pushNotification(null))
-    }, 5000)
+    dispatch(pushNotification(`you voted '${votedAnecs}'`, 10))
   }
 
   return (

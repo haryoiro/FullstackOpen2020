@@ -3,26 +3,18 @@ import {
   pushNotification
 } from '../actions/index'
 
-import anecdotesServices from '../services/anecdote'
-
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
 
-  const addAnecdotes = async (event) => {
+  const addAnecdotes = (event) => {
     event.preventDefault()
     const content = event.target.anecdotes.value
     event.target.anecdotes.value = ''
-    const newAnecdote = await anecdotesServices.createNew(content)
-    dispatch(createAnecdotes(newAnecdote))
-    notifier(content)
-  }
-
-  const notifier = (content) => {
-    dispatch(pushNotification(`"${content}" added`))
-    setInterval(() => {dispatch(pushNotification(null))}, 5000)
+    dispatch(createAnecdotes(content))
+    dispatch(pushNotification(`new anecdote '${content}'`))
   }
 
   return (
