@@ -1,24 +1,21 @@
 import { filterByWord } from '../actions/index'
 
 import React from 'react'
-import { useDispatch} from 'react-redux'
+import { connect } from 'react-redux'
 
-const Filter = () => {
-  const dispatch = useDispatch()
-
-  const handleChange = (event) => {
-    dispatch(filterByWord(event.target.value))
-  }
-
+const Filter = (props) => {
   const style = {
     marginBottom: 10,
   }
 
   return (
     <div style={style}>
-      filter <input onChange={handleChange} />
+      filter <input onChange={(e) => props.filterByWord(e.target.value)} />
     </div>
   )
 }
 
-export default Filter
+export default connect(
+  null,
+  { filterByWord }
+)(Filter)

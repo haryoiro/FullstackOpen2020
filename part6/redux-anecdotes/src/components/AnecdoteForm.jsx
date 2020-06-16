@@ -1,20 +1,16 @@
-import {
-  createAnecdotes,
-  pushNotification
-} from '../actions/index'
+import { createAnecdotes, pushNotification } from '../actions/index'
 
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 
-const AnecdoteForm = () => {
-  const dispatch = useDispatch()
+const AnecdoteForm = (props) => {
 
   const addAnecdotes = (event) => {
     event.preventDefault()
     const content = event.target.anecdotes.value
     event.target.anecdotes.value = ''
-    dispatch(createAnecdotes(content))
-    dispatch(pushNotification(`new anecdote '${content}'`))
+    props.createAnecdotes(content)
+    props.pushNotification(`new anecdote '${content}'`)
   }
 
   return (
@@ -28,4 +24,7 @@ const AnecdoteForm = () => {
   )
 }
 
-export default AnecdoteForm
+export default connect(
+  null,
+  { createAnecdotes, pushNotification }
+  )(AnecdoteForm)

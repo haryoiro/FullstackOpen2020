@@ -2,7 +2,6 @@ import { toggleImportanceOf } from '../reducers/noteReducer'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { useDispatch } from 'react-redux'
 
 function Note ({ note, onClick }) {
   return (
@@ -13,16 +12,6 @@ function Note ({ note, onClick }) {
 }
 
 function Notes (props) {
-  const dispatch = useDispatch()
-
-  // const notes = useSelector(({filter, notes}) => {
-  //   if (filter === 'ALL') {
-  //     return notes
-  //   }
-  //   return filter === 'IMPORTANT'
-  //     ? notes.filter((note) => note.important)
-  //     : notes.filter((note) => !note.important)
-  // })
   return (
     <ul>
     {props.notes.map((note) =>

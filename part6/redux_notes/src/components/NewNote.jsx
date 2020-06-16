@@ -20,7 +20,6 @@ function NewNote (props) {
   )
 }
 
-
 export default connect(
   null,
   { createNote }
