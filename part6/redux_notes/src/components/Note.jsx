@@ -1,9 +1,10 @@
 import { toggleImportanceOf } from '../reducers/noteReducer'
 
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-function Note ({ note, onClick}) {
+function Note ({ note, onClick }) {
   return (
     <li onClick={() => onClick(note.id)}>
       {note.content} <strong>{note.important ? 'important' : ''}</strong>
@@ -11,31 +12,52 @@ function Note ({ note, onClick}) {
   )
 }
 
-function Notes () {
+function Notes (props) {
   const dispatch = useDispatch()
-  const notes = useSelector(({filter, notes}) => {
-    if (filter === 'ALL') {
-      return notes
-    }
-    return filter === 'IMPORTANT'
-      ? notes.filter((note) => note.important)
-      : notes.filter((note) => !note.important)
-  })
 
-  const toggleImportance = (id) => {
-    dispatch(toggleImportanceOf(id))
-  }
+  // const notes = useSelector(({filter, notes}) => {
+  //   if (filter === 'ALL') {
+  //     return notes
+  //   }
+  //   return filter === 'IMPORTANT'
+  //     ? notes.filter((note) => note.important)
+  //     : notes.filter((note) => !note.important)
+  // })
   return (
     <ul>
-    {notes.map((note) =>
+    {props.notes.map((note) =>
       <Note
         key={note.id}
         note={note}
-        onClick={toggleImportance}
+        onClick={() => props.toggleImportanceOf(note.id)}
         />
     )}
     </ul>
   )
 }
 
-export default Notes
+const mapStateToProps = (state) => {
+  if (state.filter === 'ALL') {
+    return {
+      notes: state.notes
+    }
+  }
+  return {
+    notes: (state.filter === 'IMPORTANT'
+      ? state.notes.filter((note) => note.important)
+      : state.notes.filter((note) => !note.important)
+    )
+  }
+}
+// importしたActionをmapDispatchToPropsに渡したものを、更にconnect関数にわたすと
+// props.<actioncrator>の形でアクセスできるようになる。
+const mapDispatchToProps = {
+  toggleImportanceOf,
+}
+
+const ConnectedNotes = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Notes)
+
+export default ConnectedNotes
