@@ -1,0 +1,40 @@
+{
+  "name": "bloglist",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "build:ui": "cd ../bloglist-frontend && rm -rf build && yarn build && cp -r build ../bloglist-backend",
+    "build:test": "yarn build:ui && yarn start:test",
+    "build:all": "yarn build:ui && yarn dev",
+    "lint": "eslint .",
+    "pre": "prettier . --write",
+    "fix": "yarn pre && yarn lint --fix",
+    "start:test": "cross-env NODE_ENV=test node index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
+  },
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.14",
+    "mongoose-unique-validator": "^2.0.3",
+    "path-to-regexp": "^6.1.0",
+    "supertest": "^4.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
+  }
+}
