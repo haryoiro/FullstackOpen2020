@@ -13,9 +13,9 @@ const LoggedIn = () => {
   }
 
   return (
-    <div>
-      <p>{ username?.toUpperCase() } <span> LOGGED IN</span></p>
-      <button onClick={handleLogout}>LOGOUT</button>
+    <div className="header-container-loggedin">
+      <span className="header-container-loggedin-username">{ username?.toUpperCase() } LOGGED IN</span>
+      <button onClick={handleLogout} className="header-container-loggedin-logout">LOGOUT</button>
     </div>
   )
 }

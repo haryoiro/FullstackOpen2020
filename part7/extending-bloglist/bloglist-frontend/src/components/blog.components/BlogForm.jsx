@@ -1,5 +1,5 @@
-import { useField, useToggleVisibility } from '../Hooks/index'
-import { createBlog, pushNotification } from '../actions/index'
+import { useField, useToggleVisibility } from '../../Hooks/index'
+import { createBlog, pushNotification } from '../../actions/index'
 
 import React from 'react'
 import { useDispatch } from 'react-redux'

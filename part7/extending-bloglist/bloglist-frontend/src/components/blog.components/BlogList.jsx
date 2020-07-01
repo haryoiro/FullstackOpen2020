@@ -1,8 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Blog from './Blog'
+import {
+  Link
+} from 'react-router-dom'
 
-function Blogs() {
+export default function BlogList() {
   const blogs = useSelector((n) => n.blogs)
 
   function blogSorter(a, b) {
@@ -13,11 +15,9 @@ function Blogs() {
 
   return (
     <div>
-    {blogs.sort(blogSorter).map((blog) => (
-      <Blog key={blog.id} blog={blog} />
-    ))}
+      {blogs.sort(blogSorter).map((blog) => (
+        <Link to={`/blogs/${blog.id}`} key={blog.id}><p>{blog.title}</p></Link>
+      ))}
     </div>
   )
 }
-
-export default Blogs

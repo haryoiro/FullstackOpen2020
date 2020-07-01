@@ -1,30 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  useParams,
+  useHistory
+} from 'react-router-dom'
 
 import {
   incrementLikes,
   removeBlogPost,
   pushNotification,
-} from '../actions/index'
+} from '../../actions/index'
 
-import { useToggleVisibility } from '../Hooks/index'
-
-function Togglable({ open="OPEN", close="CLOSE", visible, children }) {
-  return (
-    <>
-      <button onClick={visible.onToggle} style={visible.showWhenVisible}>{open}</button>
-      <div style={visible.hideWhenVisible}>
-        {children}
-      <button onClick={visible.onToggle}>{close}</button>
-      </div>
-    </>
-  )
-}
-
-function Blog({ blog }) {
+function Blog() {
   const dispatch = useDispatch()
-  const visible = useToggleVisibility()
+  const blogs = useSelector((s) => s.blogs)
+  const { id } = useParams()
+  const blog = blogs?.find((n) => n.id === id)
+
+  if (!blog) return null
 
   async function addLikes(event) {
     event.preventDefault()
@@ -36,11 +30,29 @@ function Blog({ blog }) {
     }
   }
 
+  return (
+    <div key={blog.id} >
+      <h3>{blog.title}</h3>
+      <div>
+        <a href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</a>
+        <div>{blog.likes} <button onClick={addLikes}>LIKE</button> </div>
+        <div>{blog.author}</div>
+        <UserOnlyDeleteForm blog={blog}/>
+      </div>
+    </div>
+  )
+}
+
+function UserOnlyDeleteForm({ blog }) {
+  const dispatch = useDispatch()
+  const history = useHistory()
+
   async function deletePost(event) {
     event.preventDefault()
     try {
       await dispatch(removeBlogPost(blog.id))
       await dispatch(pushNotification(`${blog.title} is removed`))
+      history.push('/')
     } catch (err) {
       await dispatch(pushNotification(err))
     }
@@ -57,25 +69,9 @@ function Blog({ blog }) {
         : false
   }
 
-  function DeleteForm() {
-    return isUsername(blog)
-      ? <button onClick={deletePost}>DELETE</button>
-      : null
-  }
-
-  return (
-    <div key={blog.id} className="blog-list">
-      <div>{blog.title}</div>
-      <Togglable open="SHOW" close="CLOSE"visible={visible}>
-        <div className="blog-details">
-          {blog.url} <br />
-          {blog.likes} <button onClick={addLikes}>LIKE</button> <br />
-          {blog.author} <br />
-          <DeleteForm />
-        </div>
-      </Togglable>
-    </div>
-  )
+  return isUsername(blog)
+    ? <button onClick={deletePost}>DELETE</button>
+    : null
 }
 
 Blog.displayName = 'Blog'
