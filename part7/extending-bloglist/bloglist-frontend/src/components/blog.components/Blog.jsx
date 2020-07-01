@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   useParams,
@@ -10,12 +9,14 @@ import {
   incrementLikes,
   removeBlogPost,
   pushNotification,
+  addAnonymousComment,
 } from '../../actions/index'
+import { useField } from '../../Hooks'
 
 function Blog() {
+  const { id } = useParams()
   const dispatch = useDispatch()
   const blogs = useSelector((s) => s.blogs)
-  const { id } = useParams()
   const blog = blogs?.find((n) => n.id === id)
 
   if (!blog) return null
@@ -39,10 +40,13 @@ function Blog() {
         <div>{blog.author}</div>
         <UserOnlyDeleteForm blog={blog}/>
       </div>
+      <CommentList comments={blog.comments}/>
+      <CommentForm blog={blog}/>
     </div>
   )
 }
 
+// 投稿ユーザのみに表示される投稿削除ボタン
 function UserOnlyDeleteForm({ blog }) {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -74,21 +78,40 @@ function UserOnlyDeleteForm({ blog }) {
     : null
 }
 
+function CommentList({comments}) {
+  return (
+    <ul>
+    {comments.map((c) => (
+      <li key={c.id}>{c.comment}</li>
+    ))}
+    </ul>
+  )
+}
+
+function CommentForm({ blog }) {
+  const dispatch = useDispatch()
+  const form = useField('text')
+
+  async function handleCommentPost(event) {
+    event.preventDefault()
+    const newComment = form.props.value
+    form.onClear()
+    try {
+      await dispatch(addAnonymousComment(blog.id, blog, newComment))
+      await dispatch(pushNotification('comment posted'))
+    } catch (err) {
+      await dispatch(pushNotification(err))
+    }
+  }
+
+  return (
+    <form onSubmit={handleCommentPost}>
+      <input {...form.props} />
+      <button>COMMENT</button>
+    </form>
+  )
+}
+
 Blog.displayName = 'Blog'
-
-Blog.defaultProps = {
-  blog: null,
-  handleDelete: null,
-}
-
-Blog.propTypes = {
-  blog: PropTypes.shape({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    url: PropTypes.string,
-    author: PropTypes.string,
-    likes: PropTypes.number,
-  }),
-}
 
 export default Blog
