@@ -16,7 +16,7 @@ const LoginForm = () => {
         username: username.props.value,
         password: password.props.value,
       }))
-      await dispatch(pushNotification(`LOGIN SUCCESS`))
+      await dispatch(pushNotification(`LOGIN SUCCESSED`))
     } catch(err) {
       await dispatch(pushNotification(`valid username or password`))
     }

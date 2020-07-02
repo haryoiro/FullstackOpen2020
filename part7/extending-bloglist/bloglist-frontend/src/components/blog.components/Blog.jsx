@@ -27,14 +27,15 @@ function Blog() {
       await dispatch(incrementLikes(blog.id, blog))
       await dispatch(pushNotification(`voted at : ${blog.title}`))
     } catch (err) {
-      await dispatch(pushNotification(err))
+      await dispatch(pushNotification(err.message))
     }
   }
 
   return (
     <div key={blog.id} >
-      <h3>{blog.title}</h3>
-      <div>
+      <h3 className="blog-title">{blog.title}</h3>
+      <hr className="blog-hr"/>
+      <div className="blog-post-main">
         <a href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</a>
         <div>{blog.likes} <button onClick={addLikes}>LIKE</button> </div>
         <div>{blog.author}</div>
@@ -80,9 +81,9 @@ function UserOnlyDeleteForm({ blog }) {
 
 function CommentList({comments}) {
   return (
-    <ul>
+    <ul className="blog-post-comments">
     {comments.map((c) => (
-      <li key={c.id}>{c.comment}</li>
+      <li key={c.id} className="blog-post-comment">{c.comment}</li>
     ))}
     </ul>
   )
@@ -94,13 +95,19 @@ function CommentForm({ blog }) {
 
   async function handleCommentPost(event) {
     event.preventDefault()
-    const newComment = form.props.value
-    form.onClear()
-    try {
-      await dispatch(addAnonymousComment(blog.id, blog, newComment))
-      await dispatch(pushNotification('comment posted'))
-    } catch (err) {
-      await dispatch(pushNotification(err))
+    console.log(form.props.value.length)
+    if (form.props.value.length <= 1 || form.props.value.length >= 100) {
+      dispatch(pushNotification(`post is failed`))
+    } else {
+      const newComment = form.props.value
+      try {
+        form.onClear()
+        await dispatch(addAnonymousComment(blog.id, blog, newComment))
+        await dispatch(pushNotification('comment posted'))
+      } catch (err) {
+        form.setValue(newComment)
+        await dispatch(pushNotification(err))
+      }
     }
   }
 

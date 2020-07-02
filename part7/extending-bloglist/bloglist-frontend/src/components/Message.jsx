@@ -5,16 +5,12 @@ import { useSelector } from 'react-redux'
 const Message = () => {
   const notification = useSelector((n) => n.notification)
 
-  const style = {
-    border: 'solid',
-    padding: 5,
-    borderWidth: 1
+  if (notification) {
+    return <div className="notification">{notification.toUpperCase()}</div>
   }
-
-  if (notification)
-    return <p style={style}> {notification} </p>
-  else
+  else {
     return <div></div>
+  }
 }
 
 Message.displayName = 'Message'

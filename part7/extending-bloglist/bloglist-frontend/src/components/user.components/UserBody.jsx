@@ -12,7 +12,7 @@ import UserList from './UserList'
 // ユーザ関連コンポーネント
 // ユーザ情報に関するRouteを持っている。
 export default function UsersBody() {
-  const [services, users] = useResource('http://localhost:3000/api/users')
+  const [, users] = useResource('http://localhost:3000/api/users')
   const { path, url } = useRouteMatch()
 
   // user一覧のレスポンスをイテラブルな配列に展開

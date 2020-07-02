@@ -8,7 +8,8 @@ import {
 export default function UserList({ users, url }) {
   return (
     <>
-    <h2>USERS</h2>
+    <h2 className="page-title">USERS</h2>
+    <hr />
     <table>
       <thead>
         <tr>

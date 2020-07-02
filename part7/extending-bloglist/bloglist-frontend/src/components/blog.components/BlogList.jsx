@@ -14,9 +14,17 @@ export default function BlogList() {
   }
 
   return (
-    <div>
+    <div className="body-container-main">
       {blogs.sort(blogSorter).map((blog) => (
-        <Link to={`/blogs/${blog.id}`} key={blog.id}><p>{blog.title}</p></Link>
+        <Link to={`/blogs/${blog.id}`} key={blog.id}>
+          
+          <div className="body-container-main-bloglist">
+          <div className="body-container-main-bloglist-thumbnail"></div>
+            <div className="body-container-main-bloglist-title">
+              {blog.title}
+            </div>
+          </div>
+        </Link>
       ))}
     </div>
   )

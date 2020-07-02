@@ -27,9 +27,10 @@ const App = () => {
   function BlogBody({username}) {
     if (username !== null) {
       return (
-        <div>
-          <BlogForm />
+        <div className="body-container">
           <BlogList />
+          <hr />
+          <BlogForm />
         </div>
       )
     } else {
@@ -39,13 +40,14 @@ const App = () => {
 
   return (
     <Router>
+      <div className="header-wrapper">
         <Header />
+      </div>
         <div className="container">
-          <Message />
           <Switch>
             <Route exact path="/">
-
-            <h2>BLOGS</h2>
+              <h2 className="page-title">BLOGS</h2>
+              <hr />
               <BlogBody username={username}/>
             </Route>
             <Route path="/users">
@@ -61,21 +63,14 @@ const App = () => {
 }
 
 function Header() {
-
   return (
     <div className="header-container">
       <Link to="/" ><h5 className="header-container-links">BLOGS</h5></Link>
       <Link to="users"><h5 className="header-container-links">USERS</h5></Link>
       <LoggedIn />
+      <Message />
     </div>
   )
 }
 
-function NavBar() {
-
-}
-
-function NavLink() {
-    
-}
 export default App

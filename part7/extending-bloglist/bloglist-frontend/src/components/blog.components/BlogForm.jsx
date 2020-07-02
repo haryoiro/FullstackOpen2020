@@ -4,18 +4,18 @@ import { createBlog, pushNotification } from '../../actions/index'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
-
-function Togglable({ open="OPEN", close="CLOSE", visible, children }) {
-  return (
-    <>
-      <button onClick={visible.onToggle} style={visible.showWhenVisible}>{open}</button>
-      <div style={visible.hideWhenVisible}>
-        {children}
-      <button onClick={visible.onToggle}>{close}</button>
-      </div>
-    </>
-  )
-}
+import Togglable from '../Togglable'
+// function Togglable({ open="OPEN", close="CLOSE", visible, children }) {
+//   return (
+//     <>
+//       <button onClick={visible.onToggle} style={visible.showWhenVisible}>{open}</button>
+//       <div style={visible.hideWhenVisible}>
+//         {children}
+//       <button onClick={visible.onToggle}>{close}</button>
+//       </div>
+//     </>
+//   )
+// }
 
 function BlogForm() {
   const dispatch = useDispatch()
@@ -44,13 +44,23 @@ function BlogForm() {
   }
 
   return (
-    <Togglable visible={visible}>
-        <form onSubmit={addBlog} id="blogForm">
-          <h3>CREATE NEW</h3>
-          <div>TITLE    <input { ...title.props  } /></div>
-          <div>AUTHOR   <input { ...author.props } /></div>
-          <div>URL      <input { ...url.props    } /></div>
-          <button type="submit">POST</button>
+    <Togglable visible={visible} open="NEW POST" close="CANCEL" customClass="blog-form-main">
+        <form onSubmit={addBlog} className="body-main-blog-form">
+          <table className="body-main-blog-form-table">
+            <strong>CREATE NEW</strong>
+            <tbody>
+              <tr>
+                <td>TITLE </td><td><input { ...title.props  } /></td>
+              </tr>
+              <tr>
+                <td>AUTHOR</td><td><input { ...author.props } /></td>
+              </tr>
+              <tr>
+                <td>URL   </td><td><input { ...url.props    } /></td>
+              </tr>
+            </tbody>
+          </table>
+          <button>POST</button>
         </form>
     </Togglable>
   )
