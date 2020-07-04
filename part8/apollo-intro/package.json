@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start:apollo": "node index.js",
+    "dev:apollo": "nodemon index.js"
+  },
   "dependencies": {
     "apollo-server": "^2.15.1",
     "graphql": "^15.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
