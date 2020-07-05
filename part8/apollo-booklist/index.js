@@ -87,14 +87,27 @@ const typeDefs = gql`
   type Query {
     bookCount: Int!
     authorCount: Int!
+    allBooks: [Books!]!
+  }
+  type Books {
+    title: String!
+    published: Int!
+    author: String!
+    id: ID!
+    genres: [String!]!
   }
 `
-
+    // title: 'Clean Code',
+    // published: 2008,
+    // author: 'Robert Martin',
+    // id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
+    // genres: ['refactoring']
 const resolvers = {
   Query: {
-    bookCount: (root, args) => books.length,
-    authorCount: (root, args) => authors.length,
-  }
+    bookCount: () => books.length,
+    authorCount: () => authors.length,
+    allBooks: () => books
+  },
 }
 
 const server = new ApolloServer({
