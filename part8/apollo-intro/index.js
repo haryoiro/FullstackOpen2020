@@ -1,4 +1,5 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, UserInputError, gql } = require('apollo-server')
+const { v1: uuid } = require('uuid')
 
 let persons = [
   {
@@ -31,6 +32,11 @@ let persons = [
  * (必須フィールド)
  */
 const typeDefs = gql`
+  enum YesNo {
+    YES
+    NO
+  }
+
   type Address {
     street: String!
     city: String!
@@ -45,18 +51,40 @@ const typeDefs = gql`
 
   type Query {
     personCount: Int!
-    allPersons: [Person!]!
+    allPersons(phone: YesNo): [Person!]!
     findPerson(name: String!): Person
+  }
+
+  type Mutation {
+    addPerson(
+      name: String!
+      phone: String
+      street: String!
+      city: String!
+    ): Person
+    editNumber(
+      name: String!
+      phone: String!
+    ): Person
   }
 `
 
 /* Resolvers */
-// GraphQLクエリに対するレスポンスを定義
-
+/**
+ * Resolverは何も指定しない場合、Default Resolverが割り当てられる。
+ * (root) => root[parameter]
+ * 
+ * ex:
+ *  (root) => root.name
+ * Resolverは第一引数である`root`を介してデータにアクセスできる
+ * 
+ */
 const resolvers = {
   Query: {
     personCount: () => persons.length,
-    allPersons: () => persons,
+    allPersons: (root, args) => {
+      if (!args.phone) {return persons}
+    },
     findPerson: (root, args) => persons.find(p => p.name === args.name)
   },
   Person: {
@@ -65,6 +93,27 @@ const resolvers = {
         street,
         city
       }
+    }
+  },
+  Mutation: {
+    addPerson: (root, args) => {
+      if (persons.find(p => p.name === args.name)) {
+        throw new UserInputError('Name must be unique', {
+          invalidArgs: args.name,
+        })
+      }
+
+      const person = { ...args, id: uuid() }
+      persons = [ ...persons, person ]
+      return person
+    },
+    editNumber: (root, args) => {
+      const person = persons.find(p => p.name === args.name)
+      if (!person) return null
+
+      const updatedPerson = { ...person, phone: args.phone }
+      persons = persons.map(p => p.name === args.name ? updatedPerson : p)
+      return updatedPerson
     }
   }
 }
