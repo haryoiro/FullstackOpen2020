@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
   "dependencies": {
     "apollo-server": "^2.15.1",
     "graphql": "^15.2.0",
-    "nodemon": "^2.0.4",
-    "uuid": "^8.2.0"
+    "nodemon": "^2.0.4"
   }
 }
