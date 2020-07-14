@@ -1,45 +1,22 @@
 import React, { useState } from 'react'
-import { gql, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 
-// GraphQLでの変数は $variable ノカタチにする。
-// 実行時はuseMutation Hookを使い、変数に値を代入する。
-const CREATE_PERSON = gql`
-mutation createPerson($name: String!, $street: String!, $city: String, $phone: String) {
-  addPerson(
-    name: $name,
-    street: $street,
-    city: $city,
-    phone: $phone
-  ) {
-    name
-    phone
-    id
-    address {
-      street
-      city
-    }
-  }
-}
-`
+import {
+  CREATE_PERSON,
+  ALL_PERSONS,
+} from '../queries'
 
-const ALL_PERSONS = gqb`
-  query {
-    allPersons {
-      name
-      phone
-      id
-    }
-  }
-`
-
-function PersonForm() {
+function PersonForm({ setError }) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [street, setStreet] = useState('')
   const [city, setCity] = useState('')
 
   const [ createPerson ] = useMutation(CREATE_PERSON, {
-    refetchQueries: [ { query: ALL_PERSONS } ]
+    refetchQueries: [ { query: ALL_PERSONS } ],
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message)
+    }
   })
 
   function submit(event) {
