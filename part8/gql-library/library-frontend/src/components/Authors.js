@@ -5,9 +5,7 @@ import { ALL_AUTHORS } from '../queries'
 
 const Authors = (props) => {
   const authors = useQuery(ALL_AUTHORS)
-  if (!props.show) {
-    return null
-  }
+  if (!props.show) return null
   if (authors.loading) return <div>now loading...</div>
 
   return (

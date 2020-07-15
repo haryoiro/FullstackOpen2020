@@ -130,7 +130,8 @@ const resolvers = {
         return books.filter(b => b.genres.includes(args.genre))
       else if (args.author)
         return books.filter(b => b.author === args.author)
-      else books
+      else
+        return books
     },
     allAuthors: () => {
       return authors
@@ -147,9 +148,9 @@ const resolvers = {
         const author = { name: args.author, id: uuid() }
         authors = authors.concat(author)
       }
-      const book = { ...args, id: uuid() }
-      books = books.concat(book)
-      return books
+      const book = { ...args, published: Number(args.published), id: uuid() }
+      console.log(book)
+      return [...books, book]
     },
     editAuthor: (root, args) => {
       if (!(args.name || args.setBornTo)) return null

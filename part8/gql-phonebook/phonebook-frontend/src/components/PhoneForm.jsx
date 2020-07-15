@@ -33,7 +33,7 @@ export default function PhoneForm({ setError }) {
       <form onSubmit={submit}>
         <div>
           name <input
-            valut={name}
+            value={name}
             onChange={({ target }) => setName(target.value)}
           />
         </div>
