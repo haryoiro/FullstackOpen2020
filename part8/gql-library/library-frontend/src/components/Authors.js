@@ -1,5 +1,7 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
+// Components
+import BornUpdateForm from './BornUpdateForm'
 // GraphQL-Queries
 import { ALL_AUTHORS } from '../queries'
 
@@ -31,7 +33,7 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
-
+      <BornUpdateForm authors={authors} />
     </div>
   )
 }
