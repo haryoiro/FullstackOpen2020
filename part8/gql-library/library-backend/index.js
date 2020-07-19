@@ -1,8 +1,11 @@
 const { ApolloServer, gql, UserInputError } = require('apollo-server')
+const mongoose = require('mongoose')
 const { v1: uuid } = require('uuid')
 
+const Book = require('./model/book.model')
+const Author = require('./model/author.model')
 
-let authors = [
+let authorsRefs = [
   {
     name: 'Robert Martin',
     id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
@@ -33,7 +36,7 @@ let authors = [
  * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
 */
 
-let books = [
+let booksRefs = [
   {
     title: 'Clean Code',
     published: 2008,
@@ -95,9 +98,13 @@ const typeDefs = gql`
   type Books {
     title: String!
     published: Int!
-    author: String!
-    id: ID!
+    author: Author!
     genres: [String!]!
+    id: ID!
+  }
+  type Author {
+    name: String!
+    born: Int
   }
   type Authors {
     name: String!
@@ -109,7 +116,7 @@ const typeDefs = gql`
     addBook(
       title: String!
       published: Int!
-      author: String!
+      author: Author!
       genres: [String!]!
     ): [Books!]!
     editAuthor(
@@ -121,24 +128,21 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
+    bookCount: () => Book.collection.countDocuments,
+    authorCount: () => Author.collection.countDocuments,
     allBooks: (_, args) => {
-      if (args.author && args.genre)
-        return books.filter(b => (b.author === args.author) && (b.genres.includes(args.genre)))
-      else if (args.genre)
-        return books.filter(b => b.genres.includes(args.genre))
-      else if (args.author)
-        return books.filter(b => b.author === args.author)
-      else
-        return books
+      if (!args.title) {
+        return Book.find({})
+      }
     },
-    allAuthors: () => {
-      return authors
+    allAuthors: (_, args) => {
+      if (!args.name) {
+        return Author.find({})
+      }
     }
   },
   Mutation: {
-    addBook: (root, args) => {
+    addBook: (_, args) => {
       if (books.find(b => b.title === args.title)) {
         throw new UserInputError('Title must be unique', {
           invalidArgs: args.title,
@@ -152,16 +156,20 @@ const resolvers = {
       console.log(book)
       return [...books, book]
     },
-    editAuthor: (root, args) => {
-      if (!(args.name || args.setBornTo)) return null
+    editAuthor: (_, args) => {
+      const author = await Author.findOne({ name: args.name })
+      if (!author) {
+        throw new UserInputError('AUTHOR IS NOT FOUND')
+      }
 
-      const byAuthor = authors.find(a => a.name === args.name)
-      if (!byAuthor) return null
+      author.born = Number(args.setBornTo)
 
-      const editedAuthor = { ...byAuthor, born: args.setBornTo}
-      authors = authors.map(a => a.name === args.name ? editedAuthor : a)
+      try {
+        author.save()
+      } catch (error) {
+        throw new UserInputError(error.message, { invalidArgs: args })
+      }
 
-      return editedAuthor
     }
   },
   Authors: {
