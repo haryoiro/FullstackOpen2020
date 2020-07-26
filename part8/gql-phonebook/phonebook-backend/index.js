@@ -64,7 +64,7 @@ const resolvers = {
       return person
     },
     createUser: (root, args) => {
-      const user = new UserInputError({ username: args.username })
+      const user = new User({ username: args.username })
 
       return user.save()
         .catch((error) => {
@@ -92,7 +92,7 @@ const resolvers = {
       try {
         person.save()
       } catch (error) {
-        throw new UserInputError(erro.message, {
+        throw new UserInputError(error.message, {
           invalidArgs: args,
         })
       }

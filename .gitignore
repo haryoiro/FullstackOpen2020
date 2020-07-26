@@ -1,3 +1,4 @@
 .DS*
-*log
 node_modules
+*.chunk*
+*.log
