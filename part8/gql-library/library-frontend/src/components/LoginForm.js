@@ -4,7 +4,7 @@ import { LOGIN } from '../queries'
 
 const LoginForm = ({ show, setError, setToken, setPage }) => {
   const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [password, setPassword] = useState('secret')
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
@@ -24,7 +24,7 @@ const LoginForm = ({ show, setError, setToken, setPage }) => {
 
   const submit = (event) => {
     event.preventDefault()
-    login({ variables: { username, password } })
+    login({ variables: { username, password: 'secret' } })
     setPage('authors')
   }
 

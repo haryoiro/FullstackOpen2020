@@ -42,27 +42,20 @@ const typeDefs = gql`
     genres: [String!]!
     id: ID!
   }
-  type Books {
-    title: String!
-    published: Int!
-    author: Authors
-    genres: [String!]!
-    id: ID
-  }
   type Author {
-    name: String!
-    born: Int
-    id: ID
-  }
-  type Authors {
-    name: String
-    born: Int
+    name: String,
+    born: Int,
+    bookCount: Int,
+    id: ID!
   }
 
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks: [Books]
+    allBooks(
+      author: String,
+      genre: String
+    ): [Book]
     allAuthors: [Author!]!
     me: User
   }
@@ -81,23 +74,26 @@ const typeDefs = gql`
     addBook(
       title: String!
       published: Int!
-      author: String!
+      name: String!
       genres: [String!]!
-    ): Books!
+    ): Book!
 
     editAuthor(
       name: String!
       setBornTo: Int!
-    ): Authors
+    ): Author
   }
 `
 
 const resolvers = {
   Query: {
-    bookCount: () => Book.collection.countDocuments(),
-    authorCount: () => Author.collection.countDocuments(),
-    allBooks: () => {
-      return Book.find({})
+    bookCount: () => Book.find({}).countDocuments(),
+    authorCount: () => Author.find({}).countDocuments(),
+    allBooks: (_, { author, genre }) => {
+      if (genre) {
+        return Book.find({ genre }).populate('author')
+      }
+      return Book.find({}).populate('author')
     },
     allAuthors: () => {
       return Author.find({})
@@ -134,36 +130,28 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, JWT_SECRET)}
     },
-    addBook: async (root, args, { currentUser }) => {
+    addBook: async (root, { name, title, published, genres }, { currentUser }) => {
       if (!currentUser) {
         throw new AuthenticationError('NOT AUTHENTICATED')
       }
-
-      let author = await Author.findOne({ name: args.author })
-      if (!author) {
-        author = await new Author({ name: args.author })
-        await author.save()
-      }
-
-      const returnedBook = await Book.findOne({ title: args.title })
-      if (returnedBook) {
-        throw new UserInputError('This book is already exists!')
-      }
-
-      const book = await new Book({
-        ...args, author: author._id.toString()
-      })
-      console.log(book)
       try {
-        await book.save()
+        const newBook = await new Book({ title, published, genres })
+
+        let authorId = await Author.findOne({ name }).select('_id')
+        if (!authorId) {
+          const newAuthor = await new Author({ name })
+          await newAuthor.save()
+          authorId = newAuthor._id
+        }
+
+        newBook.author = authorId
+        await newBook.save()
+        const returnedBook = await Book.findOne({ title }).populate('author')
+        return returnedBook
       } catch (error) {
-        console.log(error)
-        throw new UserInputError(error.message, {
-          invalidArgs: args,
-        })
+        throw new UserInputError(error.message)
       }
 
-      return book
     },
     editAuthor: async (root, args, { currentUser }) => {
       const { name, setBornTo } = args

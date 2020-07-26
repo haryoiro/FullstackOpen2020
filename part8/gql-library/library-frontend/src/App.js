@@ -18,15 +18,8 @@ const Notify = ({ errorMessage }) => {
 const App = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [page, setPage] = useState('authors')
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(localStorage.getItem('library-number-user-token'))
   const client = useApolloClient()
-
-  useEffect(() => {
-    let currentToken = localStorage.getItem('library-number-user-token')
-    if (currentToken) {
-      setToken(currentToken)
-    }
-  }, [])
 
   const notify = (message) => {
     setErrorMessage(message)

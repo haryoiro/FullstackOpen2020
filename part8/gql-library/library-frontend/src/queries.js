@@ -15,22 +15,18 @@ query {
     title
     published
     genres
-    id
+    author {
+      name
+    }
   }
 }
 `
-    // title: String!
-    // published: Int!
-    // author: Author
-    // genres: [String!]!
-    // id: ID!
-
 export const ADD_BOOK = gql`
-mutation addBook($title: String!, $published: Int!, $author: String!, $genres: [String!]!) {
+mutation addBook($title: String!, $published: Int!, $name: String!, $genres: [String!]!) {
   addBook(
     title: $title,
     published: $published,
-    author: $author,
+    name: $name,
     genres: $genres
   ) {
     title

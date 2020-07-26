@@ -28,7 +28,7 @@ const NewBook = ({ setError, show }) => {
     event.preventDefault()
 
     console.log('add book...')
-    changeBookForm({ variables: { title, published: parseInt(published), author, genres } })
+    changeBookForm({ variables: { title, published: parseInt(published), name: author, genres } })
 
     setTitle('')
     setPublished('')
