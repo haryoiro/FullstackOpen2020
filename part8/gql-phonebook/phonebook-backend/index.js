@@ -9,6 +9,7 @@ const {
 } = require('./util/config')
 const { typeDefs } = require('./typeDefs/typeDefs')
 const Person = require('./models/person.model')
+const User = require('./models/user.model')
 
 
 mongoose.set('useFindAndModify', false)

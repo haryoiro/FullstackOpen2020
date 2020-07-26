@@ -1,9 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 
-
-import { EDIT_NUMBER, ALL_PERSONS } from '../queries'
-import { useEffect } from 'react'
+import { EDIT_NUMBER } from '../queries'
 
 export default function PhoneForm({ setError }) {
   const [name, setName] = useState('')
@@ -24,6 +22,7 @@ export default function PhoneForm({ setError }) {
     if (result.data && result.data.editNumber === null) {
       setError('person not found')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result.data])
 
   return (
