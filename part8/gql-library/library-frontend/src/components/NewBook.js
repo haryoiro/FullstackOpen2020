@@ -7,7 +7,7 @@ import {
   ALL_AUTHORS,
 } from '../queries'
 
-const NewBook = (props) => {
+const NewBook = ({ setError, show }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
@@ -15,19 +15,20 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([])
 
   const [changeBookForm, result] = useMutation(ADD_BOOK, {
-    refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }]
+    refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }],
+    onError: (error) => {
+      setError(error.message)
+    },
   })
 
-  if (!props.show) return null
+  if (!show) return null
   if (result.loading) return <div>Now Loading... </div>
 
   const submit = async (event) => {
     event.preventDefault()
 
     console.log('add book...')
-    changeBookForm({ variables: { title, published: Number(published), author, genres } })
-      .then(console.log)
-      .catch((e) => console.log('catch', e))
+    changeBookForm({ variables: { title, published: parseInt(published), author, genres } })
 
     setTitle('')
     setPublished('')

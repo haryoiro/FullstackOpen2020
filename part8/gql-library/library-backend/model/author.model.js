@@ -3,7 +3,6 @@ const { Schema, model } = require('mongoose')
 const authorSchema = new Schema({
   name: {
     type: String,
-    required: true,
     unique: true,
     minlength: 4,
   },

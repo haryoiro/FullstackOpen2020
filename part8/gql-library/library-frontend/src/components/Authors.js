@@ -6,23 +6,19 @@ import BornUpdateForm from './BornUpdateForm'
 import { ALL_AUTHORS } from '../queries'
 
 const Authors = (props) => {
-  const authors = useQuery(ALL_AUTHORS)
+  const authors = useQuery(ALL_AUTHORS, { pollInterval: 2000 })
   if (!props.show) return null
-  if (authors.loading) return <div>now loading...</div>
+  if (authors.loading) return <div>Now Loading...</div>
 
   return (
     <div>
-      <h2>authors</h2>
+      <h2>AUTHORS</h2>
       <table>
         <tbody>
           <tr>
-            <th></th>
-            <th>
-              born
-            </th>
-            <th>
-              books
-            </th>
+            <th> NAME   </th>
+            <th> BORN   </th>
+            <th>   </th>
           </tr>
           {authors.data.allAuthors.map(a =>
             <tr key={a.name}>

@@ -8,7 +8,7 @@ import {
 
 //{__typename: "Authors", name: "Fyodor Dostoevsky", bookCount: 2, born: 1821, id: "afa5b6f1-344d-11e9-a414-719
 export default function BornUpdateForm({ authors }) {
-  const [current, setCurrent] = useState(authors.data.allAuthors[0].name)
+  const [current, setCurrent] = useState('None')
   const [bornTo, setBornTo] = useState(2000)
 
   const [ changeAuthorsBorn ] = useMutation(EDIT_AUTHORS_BORN, {
@@ -34,7 +34,7 @@ export default function BornUpdateForm({ authors }) {
   return (
     <form onSubmit={handleSubmitAuthorsBorn}>
       <select value={current} onChange={handleChangeSelected}>
-        <option selected value="None">None</option>
+        <option defaultValue="None">None</option>
         {authors.data.allAuthors.map(a =>
           <option value={a.name} key={a.id}>{a.name}</option>
         )}

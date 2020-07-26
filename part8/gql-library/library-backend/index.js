@@ -42,17 +42,27 @@ const typeDefs = gql`
     genres: [String!]!
     id: ID!
   }
-
+  type Books {
+    title: String!
+    published: Int!
+    author: Authors
+    genres: [String!]!
+    id: ID
+  }
   type Author {
     name: String!
     born: Int
-    id: ID!
+    id: ID
+  }
+  type Authors {
+    name: String
+    born: Int
   }
 
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks(author: String, genre: String): [Book!]!
+    allBooks: [Books]
     allAuthors: [Author!]!
     me: User
   }
@@ -73,12 +83,12 @@ const typeDefs = gql`
       published: Int!
       author: String!
       genres: [String!]!
-    ): Book!
+    ): Books!
 
     editAuthor(
       name: String!
       setBornTo: Int!
-    ): Author
+    ): Authors
   }
 `
 
@@ -86,7 +96,7 @@ const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
-    allBooks: (_, args) => {
+    allBooks: () => {
       return Book.find({})
     },
     allAuthors: () => {
@@ -110,10 +120,10 @@ const resolvers = {
       return newUser
     },
     login: async (root, args) => {
-      const { username } = args
+      const { username, password } = args
 
       const user = await User.findOne({ username })
-      if (!user || args.password !== 'secret') {
+      if (!user || password !== 'secret') {
         throw new UserInputError('WRONG CREDENTIALS')
       }
 
@@ -129,38 +139,39 @@ const resolvers = {
         throw new AuthenticationError('NOT AUTHENTICATED')
       }
 
+      let author = await Author.findOne({ name: args.author })
+      if (!author) {
+        author = await new Author({ name: args.author })
+        await author.save()
+      }
+
+      const returnedBook = await Book.findOne({ title: args.title })
+      if (returnedBook) {
+        throw new UserInputError('This book is already exists!')
+      }
+
+      const book = await new Book({
+        ...args, author: author._id.toString()
+      })
+      console.log(book)
       try {
-        const author = await Author.findOne({ name: args.author })
-        if (!author) {
-          author = await new Author({ name: args.author }).save()
-        }
-
-        const returnedBook = await Book.findOne({ title: args.title })
-        if (returnedBook) {
-          throw new UserInputError('This book is already exists!')
-        }
-
-        const book = await new Book({
-          ...args, author: author._id.toString()
-        })
-
         await book.save()
       } catch (error) {
+        console.log(error)
         throw new UserInputError(error.message, {
           invalidArgs: args,
         })
       }
 
-      return await book
+      return book
     },
     editAuthor: async (root, args, { currentUser }) => {
+      const { name, setBornTo } = args
+      if (!currentUser) {
+        throw new AuthenticationError('NOT AUTHENTICATED')
+      }
+      const author = await Author.findOne({ name })
       try {
-        if (!currentUser) {
-          throw new AuthenticationError('NOT AUTHENTICATED')
-        }
-        const { name, setBornTo } = args
-
-        const author = await Author.findOne({ name })
         author.born = Number(setBornTo)
 
         await author.save()
@@ -169,7 +180,7 @@ const resolvers = {
       }
 
       return author
-    }
+    },
   },
 }
 
