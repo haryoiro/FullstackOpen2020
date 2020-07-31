@@ -15,7 +15,14 @@ const Recommend = ({ setError, show }) => {
   const [favoriteGenre, setFavoriteGenre] = useState('')
   
   useEffect(() => {
-    if (show) loadUser()
+    console.log(show)
+    if (show) {
+      if (!user.data)
+        loadUser()
+      if (recommendedList.length > 0) {
+        recommend.refetch()
+      }
+    }
 
     if (!user.loading && user.data && user.data.me) {
       setFavoriteGenre(user.data.me.favoriteGenre)
@@ -28,7 +35,7 @@ const Recommend = ({ setError, show }) => {
 
 
   if (!show) return null
-  if (user.loading || recommend.loading) return "user loading"
+  if (user.loading || recommend.loading || !recommendedList) return "user loading"
 
   return (
     <>
