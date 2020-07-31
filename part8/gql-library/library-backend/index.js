@@ -9,7 +9,7 @@ const {
 } = require('./util/config')
 const Book =  require('./model/book.model')
 const Author = require('./model/author.model')
-const User =  require('./model/user.modle')
+const User =  require('./model/user.model')
 
 mongoose.set('useFindAndModify', false)
 console.log('--------------------------------')
@@ -91,7 +91,8 @@ const resolvers = {
     authorCount: () => Author.find({}).countDocuments(),
     allBooks: (_, { author, genre }) => {
       if (genre) {
-        return Book.find({ genre }).populate('author')
+        console.log(genre)
+        return Book.find({ genres: genre }).populate('author')
       }
       return Book.find({}).populate('author')
     },

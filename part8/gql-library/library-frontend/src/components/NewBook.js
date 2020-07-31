@@ -5,6 +5,7 @@ import {
   ADD_BOOK,
   ALL_BOOKS,
   ALL_AUTHORS,
+  RECOMMEND_BOOKS,
 } from '../queries'
 
 const NewBook = ({ setError, show }) => {
