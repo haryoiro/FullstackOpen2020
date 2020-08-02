@@ -24,7 +24,7 @@ const Recommend = ({ setError, show }) => {
       }
     }
 
-    if (!user.loading && user.data && user.data.me) {
+    if (!user.loading && user.data) {
       setFavoriteGenre(user.data.me.favoriteGenre)
       loadRecommend({ variables: { genre: user.data.me.favoriteGenre } })
     }

@@ -54,6 +54,9 @@ const typeDefs = gql`
       name: String!
     ): User
   }
+  type Subscription {
+    personAdded: Person!
+  }
 `
 
 module.exports = {
