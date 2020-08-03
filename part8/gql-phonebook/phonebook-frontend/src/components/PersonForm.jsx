@@ -5,8 +5,9 @@ import {
   CREATE_PERSON,
   ALL_PERSONS,
 } from '../queries'
+import { update } from '../../../phonebook-backend/models/user.model'
 
-function PersonForm({ setError }) {
+function PersonForm({ setError, updateCacheWith }) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [street, setStreet] = useState('')
@@ -28,6 +29,7 @@ function PersonForm({ setError }) {
           allPersons: [...dataInStore.allPersons, response.data.addPerson],
         }
       })
+      updateCacheWith(response.data.addPerson)
     }
   })
 

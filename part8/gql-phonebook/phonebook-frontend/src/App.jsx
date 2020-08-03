@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useQuery, useApolloClient } from '@apollo/client'
+import { useQuery, useApolloClient, useSubscription } from '@apollo/client'
 
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
@@ -14,6 +14,14 @@ function App() {
   const result = useQuery(ALL_PERSONS, { pollInterval: 2000 })
   const client = useApolloClient()
 
+  useSubscription(PERSON_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedPerson = subscriptionData.data.personAdded
+      notify(`${addedPerson} ADDED`)
+      updateCacheWith(addedPerson)
+    }
+  })
+
   if (result.loading) { return <div>loading...</div>  }
 
   if (!token) {
@@ -27,6 +35,21 @@ function App() {
         />
       </div>
     )
+  }
+
+  function updateCacheWith(addedPerson) {
+    const includedIn = (set, object) =>
+      set.map(p => p.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_PERSONS })
+    if (!includedIn(dataInStore.allPersons, addedPerson)) {
+      client.writeQuery({
+        query: ALL_PERSONS,
+        data: {
+          allPersons : dataInStore.allPersons.concat(addedPerson)
+        }
+      })
+    }
   }
 
   function notify(message) {
@@ -47,7 +70,7 @@ function App() {
       <button onClick={logout}>LOGOUT</button>
       <Notify errorMessage={errorMessage} />
       <Persons persons={result.data.allPersons} />
-      <PersonForm setError={notify} />
+      <PersonForm setError={notify} updateCacheWith={updateCacheWith}/>
       <PhoneForm setError={notify} />
     </>
   )

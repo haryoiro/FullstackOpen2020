@@ -4,6 +4,7 @@ const typeDefs = gql`
     name: String!
     phone: String
     address: Address!
+    friendOf: [User!]!
     id: ID!
   }
   type Address {
@@ -54,6 +55,7 @@ const typeDefs = gql`
       name: String!
     ): User
   }
+
   type Subscription {
     personAdded: Person!
   }

@@ -1,5 +1,10 @@
 require('dotenv').config()
-const { ApolloServer, UserInputError, AuthenticationError } = require('apollo-server')
+const {
+  ApolloServer,
+  PubSub,
+  UserInputError,
+  AuthenticationError
+} = require('apollo-server')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 
@@ -11,6 +16,7 @@ const { typeDefs } = require('./typeDefs/typeDefs')
 const Person = require('./models/person.model')
 const User = require('./models/user.model')
 
+const pubsub = new PubSub()
 
 mongoose.set('useFindAndModify', false)
 console.log('--------------------------------')
@@ -30,9 +36,11 @@ const resolvers = {
     personCount: () => Person.collection.countDocuments(),
     allPersons: (root, args) => {
       if (!args.phone) {
-        return Person.find({})
+        return Person.find({}).populate('friendOf')
       }
-      return Person.find({ phone: { $exists: args.phone === 'YES '}})
+      return Person
+        .find({ phone: { $exists: args.phone === 'YES ' } })
+      .populate('friendOf')
     },
     findPerson: (root, args) => Person.findOne({ name: args.name }),
     me: (root, args, context) => {
@@ -45,6 +53,15 @@ const resolvers = {
         street: root.street,
         city: root.city,
       }
+    },
+    friendOf: async (root) => {
+      const friends = await User.find({
+        friends: {
+          $in: [root._id]
+        }
+      })
+
+      return friends
     }
   },
   Mutation: {
@@ -61,6 +78,8 @@ const resolvers = {
       } catch (error) {
         throw new UserInputError(error.message, { invalidArgs: args })
       }
+
+      pubsub.publish('PERSON_ADDED', { personAdded: person })
 
       return person
     },
@@ -116,6 +135,11 @@ const resolvers = {
 
       return currentUser
     },
+  },
+  Subscription: {
+    personAdded: {
+      subscribe: () => pubsub.asyncIterator(['PERSON_ADDED'])
+    }
   }
 }
 
@@ -141,6 +165,7 @@ const server = new ApolloServer({
 /* START TO SERVER */
 server
   .listen()
-  .then(({ url }) => {
+  .then(({ url, subscriptionsUrl }) => {
     console.log(`Server ready at ${url}`)
+    console.log(`Subscriptions ready at ${subscriptionsUrl}`)
   })
