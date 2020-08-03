@@ -1,11 +1,29 @@
 import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
+import { PERSON_DETAILS } from '../queries'
 
-import {
-  CREATE_PERSON,
-  ALL_PERSONS,
-} from '../queries'
-import { update } from '../../../phonebook-backend/models/user.model'
+export const ALL_PERSONS = gql`
+query {
+  allPersons {
+    ...PersonDetails
+  }
+}
+${PERSON_DETAILS}
+`
+
+export const CREATE_PERSON = gql`
+mutation createPerson($name: String!, $street: String!, $city: String, $phone: String) {
+  addPerson(
+    name: $name,
+    street: $street,
+    city: $city,
+    phone: $phone
+  ) {
+    ...PersonDetails
+  }
+}
+${PERSON_DETAILS}
+`
 
 function PersonForm({ setError, updateCacheWith }) {
   const [name, setName] = useState('')

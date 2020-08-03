@@ -1,5 +1,6 @@
 const { gql } = require('apollo-server')
-const typeDefs = gql`
+
+const types = `
   type Person {
     name: String!
     phone: String
@@ -19,17 +20,19 @@ const typeDefs = gql`
   type Token {
     value: String!
   }
-  enum YesNo {
-    YES
-    NO
-  }
-  type Query {
+`
+
+const queries = `
+ type Query {
     personCount: Int!
     allPersons(phone: YesNo): [Person!]!
     findPerson(name: String!): Person
     me: User
   }
-  type Mutation {
+`
+
+const mutation = `
+ type Mutation {
     addPerson(
       name: String!
       phone: String
@@ -55,10 +58,27 @@ const typeDefs = gql`
       name: String!
     ): User
   }
+`
 
+const subscriptions = `
   type Subscription {
     personAdded: Person!
   }
+`
+
+const enumTypes = `
+  enum YesNo {
+    YES
+    NO
+  }
+`
+
+const typeDefs = gql`
+  ${enumTypes}
+  ${types}
+  ${queries}
+  ${mutation}
+  ${subscriptions}
 `
 
 module.exports = {

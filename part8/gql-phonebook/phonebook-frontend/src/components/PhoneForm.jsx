@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 
-import { EDIT_NUMBER } from '../queries'
+import { PERSON_DETAILS } from '../queries'
+
+export const EDIT_NUMBER = gql`
+  mutation editNumber($name: String!, $phone: String!) {
+    editNumber(name: $name, phone: $phone)  {
+      ...PersonDetails
+    }
+  }
+  ${PERSON_DETAILS}
+`
 
 export default function PhoneForm({ setError }) {
   const [name, setName] = useState('')

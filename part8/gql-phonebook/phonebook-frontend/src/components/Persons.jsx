@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 
-import { FIND_PERSON } from '../queries'
+import { PERSON_DETAILS } from '../queries'
+
+export const FIND_PERSON = gql`
+  query findPersonByName($nameToSearch: String!) {
+    findPerson(name: $nameToSearch) {
+      ...PersonDetails
+    }
+  }
+  ${PERSON_DETAILS}
+`
 
 function Persons({ persons }) {
   // 遅延読み込み

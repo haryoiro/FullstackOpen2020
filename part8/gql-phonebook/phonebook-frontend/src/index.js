@@ -11,7 +11,7 @@ import {
 } from '@apollo/client'
 
 import { getMainDefinition } from '@apollo/client/utilities'
-import { } from '@apollo/link-ws'
+import { WebSocketLink } from '@apollo/link-ws'
 
 if (!window.Promise) window.Promise = PromisePolyfill
 

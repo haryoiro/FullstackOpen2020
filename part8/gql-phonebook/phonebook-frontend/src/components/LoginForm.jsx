@@ -1,7 +1,14 @@
 // eslint-disable-next-line react-hooks/exhaustive-deps
 import React, { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
-import { LOGIN } from '../queries'
+
+export const LOGIN = gql`
+mutation login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    value
+  }
+}
+`
 
 export default function LoginForm({ setError, setToken }) {
   const [username, setUsername] = useState('')

@@ -1,21 +1,17 @@
 require('dotenv').config()
 const {
-  ApolloServer,
-  PubSub,
-  UserInputError,
-  AuthenticationError
+  ApolloServer, PubSub, UserInputError, AuthenticationError,
 } = require('apollo-server')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 
 const {
-  MONGODB_URI,
-  JWT_SECRET,
+  MONGODB_URI, JWT_SECRET,
 } = require('./util/config')
+
 const { typeDefs } = require('./typeDefs/typeDefs')
 const Person = require('./models/person.model')
 const User = require('./models/user.model')
-
 const pubsub = new PubSub()
 
 mongoose.set('useFindAndModify', false)
@@ -23,13 +19,9 @@ console.log('--------------------------------')
 console.log('CONNECTING TO ', MONGODB_URI)
 console.log('--------------------------------')
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
-  .then(() => {
-    console.log('CONNECTED TO MONGODB')
-  })
-  .catch((error) => {
-    console.log('ERROR CONNECTION TO MONGODB: ', error.message)
-  })
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useCreateIndex: true  })
+  .then(() => console.log('CONNECTED TO MONGODB') )
+  .catch((error) => console.log('ERROR CONNECTION TO MONGODB: ', error.message) )
 
 const resolvers = {
   Query: {
@@ -149,12 +141,9 @@ const server = new ApolloServer({
   resolvers,
   // ユーザ識別など複数のリゾルバによって共有される処理を行うための適切な場所
   context: async ({ req }) => {
-    const auth = req ? req.headers.authorization : null
+    const auth = req && req.headers.authorization ? req.headers.authorization : null
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(
-        auth.substring(7), JWT_SECRET
-      )
-
+      const decodedToken = jwt.verify( auth.substring(7), JWT_SECRET )
       const currentUser = await User.findById(decodedToken.id).populate('friends')
       // 返した値はリゾルバの第三引数で参照できる。
       return { currentUser }
