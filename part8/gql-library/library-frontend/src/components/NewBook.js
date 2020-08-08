@@ -5,10 +5,9 @@ import {
   ADD_BOOK,
   ALL_BOOKS,
   ALL_AUTHORS,
-  RECOMMEND_BOOKS,
 } from '../queries'
 
-const NewBook = ({ setError, show }) => {
+const NewBook = ({ setError, show, updateCacheWith }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
@@ -18,8 +17,13 @@ const NewBook = ({ setError, show }) => {
   const [changeBookForm, result] = useMutation(ADD_BOOK, {
     refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }],
     onError: (error) => {
-      setError(error.message)
+      if (error.graphQLErrors[0]) {
+        setError(error.graphQLErrors[0])
+      }
     },
+    update: (store, res) => {
+      updateCacheWith(res.data.addedBook)
+    }
   })
 
   if (!show) return null
@@ -28,7 +32,7 @@ const NewBook = ({ setError, show }) => {
   const submit = async (event) => {
     event.preventDefault()
 
-    console.log('add book...')
+    console.log('Create Book Successfuly')
     changeBookForm({ variables: { title, published: parseInt(published), name: author, genres } })
 
     setTitle('')

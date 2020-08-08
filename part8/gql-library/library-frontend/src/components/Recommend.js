@@ -15,7 +15,6 @@ const Recommend = ({ setError, show }) => {
   const [favoriteGenre, setFavoriteGenre] = useState('')
   
   useEffect(() => {
-    console.log(show)
     if (show) {
       if (!user.data)
         loadUser()
@@ -30,7 +29,7 @@ const Recommend = ({ setError, show }) => {
     }
 
     if (recommend.data) setRecommendedList(recommend.data.allBooks)
-
+  // eslint-disable-next-line
   }, [show, user.loading, recommend.data])
 
 

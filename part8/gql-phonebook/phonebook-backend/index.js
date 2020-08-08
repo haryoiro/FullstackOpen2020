@@ -72,9 +72,9 @@ const resolvers = {
         await currentUser.save()
 
       } catch (error) {
-      
+
         throw new UserInputError(error.message, { invalidArgs: args })
-      
+
       }
 
       pubsub.publish('PERSON_ADDED', { personAdded: person })

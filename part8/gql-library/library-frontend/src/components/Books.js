@@ -18,7 +18,7 @@ const Books = ({ setError, show }) => {
 
       let returned = genre === 'ALL'
         ? data.allBooks
-        : data.allBooks.filter((a) => a.genres == genre)
+        : data.allBooks.filter((a) => a.genres === genre)
       setFiltered(returned)
     }
   }, [data, genre])
