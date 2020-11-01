@@ -3,8 +3,9 @@ const app = express()
 
 const PORT = 3000
 
-app.get('/ping', (_req: any, res: any) => {
-    res.send('pong')
+
+app.get('/hello', (_req, res) => {
+    res.send('Hello FullStack!')
 })
 
 app.listen(PORT, () => {
