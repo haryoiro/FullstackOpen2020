@@ -23,6 +23,12 @@ interface BmiValues {
     weight: number;
 }
 
+interface BmiJson {
+    height: number;
+    weight: number;
+    bmi: string;
+}
+
 const parseArgs = (args: Array<string>): BmiValues => {
     if (args.length < 4) throw new Error('Not enough arguments')
     if (args.length > 4) throw new Error('Too many arguments');
@@ -58,10 +64,21 @@ const bmiCategories = (score: number): string => {
     else return 'This score is not intended'
 }
 
+export const bmiToJson = (height: number, weight: number): BmiJson => {
+    const score = bmiScore(height, weight)
+    const categ = bmiCategories(score)
+    return {
+        weight,
+        height,
+        bmi: categ,
+    }
+}
+
 try {
     const { height, weight } = parseArgs(process.argv)
     const score = bmiScore(height, weight)
     console.log(bmiCategories(score))
+    
 } catch (e) {
     console.log('Error, something bad happened, message: ', e.message)
 }
